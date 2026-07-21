@@ -1,0 +1,55 @@
+html,
+body {
+  background: #111319;
+}
+
+html.zen-app-ready,
+html.zen-app-ready body {
+  background: transparent;
+}
+
+#root {
+  opacity: 0;
+}
+
+html.zen-app-ready #root {
+  opacity: 1;
+  transition: opacity 120ms ease;
+}
+
+#zen-boot-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483646;
+  overflow: hidden;
+  opacity: 1;
+  pointer-events: none;
+  background: #111319;
+  transition: opacity 180ms ease;
+}
+
+#zen-boot-wallpaper {
+  position: absolute;
+  inset: -64px;
+  background-color: #111319;
+  background-position: center;
+  background-size: cover;
+  transform: translateZ(0);
+}
+
+#zen-boot-tint {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 10, 15, 0.2);
+}
+
+html.zen-app-ready #zen-boot-shell {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #zen-boot-shell,
+  html.zen-app-ready #root {
+    transition-duration: 1ms;
+  }
+}

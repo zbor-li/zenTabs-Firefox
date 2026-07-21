@@ -1,0 +1,41 @@
+/* Bottom Toolbar */
+.bottom-toolbar {
+  position: fixed;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: fit-content;
+  display: flex;
+  gap: 16px;
+  padding: 12px 24px;
+}
+
+.toolbar-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.2s;
+  opacity: 0.8;
+}
+
+.toolbar-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.toolbar-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.toolbar-btn span {
+  font-size: 0.7rem;
+  font-weight: 500;
+}

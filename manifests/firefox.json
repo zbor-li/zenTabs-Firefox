@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "Zen Tab",
+  "version": "1.4.6",
+  "description": "A customizable glassmorphism start page with private GitHub sync.",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs",
+    "unlimitedStorage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "commands": {
+    "add-current-page": {
+      "suggested_key": {
+        "default": "Alt+Shift+F",
+        "mac": "Command+Shift+F"
+      },
+      "description": "Add the current page to Zen Tab"
+    }
+  },
+  "icons": {
+    "128": "logo.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "zentab@yourdomain.com",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  }
+}
