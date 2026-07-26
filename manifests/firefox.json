@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Zen Tab",
-  "version": "1.4.6",
+  "version": "1.4.9",
   "description": "A customizable glassmorphism start page with private GitHub sync.",
   "chrome_url_overrides": {
     "newtab": "index.html"

@@ -9,3 +9,4 @@ if (!['firefox', 'chrome'].includes(target) || !outputDirectory) {
 const source = resolve(`manifests/${target}.json`);
 JSON.parse(await readFile(source, 'utf8'));
 await copyFile(source, resolve(outputDirectory, 'manifest.json'));
+await copyFile(resolve('LICENSE'), resolve(outputDirectory, 'LICENSE'));

@@ -4,6 +4,7 @@ import { FaviconImage } from './FaviconImage';
 import { normalizeNavigationUrl } from '../url';
 import { t } from '../i18n';
 import type { FolderSourceRect } from './FolderModal';
+import { launchWithIconAnimation } from '../iconLaunch';
 
 
 interface BookmarkGridProps {
@@ -150,7 +151,12 @@ export function BookmarkGrid({ items, onItemsChange, onFolderClick, onEditClick,
                 height: rect.height,
               });
             }
-            else if (item.url) window.location.href = normalizeNavigationUrl(item.url);
+            else if (item.url) {
+              const destination = normalizeNavigationUrl(item.url);
+              launchWithIconAnimation(event.currentTarget, () => {
+                window.location.href = destination;
+              });
+            }
           }}
           onContextMenu={(e) => handleContextMenu(e, item)}
         >

@@ -116,6 +116,7 @@ export const SearchBox = memo(function SearchBox({ bookmarks, onFolderOpen, onSe
   const listboxId = useId();
   const engineMenuId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
   const [history, setHistory] = useState<SearchHistoryEntry[]>([]);
   const [engines, setEngines] = useState<SearchEngine[]>(DEFAULT_ENGINES);
@@ -124,6 +125,67 @@ export const SearchBox = memo(function SearchBox({ bookmarks, onFolderOpen, onSe
   const [isFocused, setIsFocused] = useState(false);
   const [suggestionsDismissed, setSuggestionsDismissed] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+
+  useEffect(() => {
+    let stopped = false;
+    let animationFrame: number | null = null;
+    const timers: number[] = [];
+
+    const focusSearchInput = () => {
+      if (stopped || document.visibilityState !== 'visible') return;
+
+      const input = inputRef.current;
+      if (!input?.isConnected) return;
+
+      const activeElement = document.activeElement;
+      const anotherControlHasFocus = document.hasFocus()
+        && activeElement
+        && activeElement !== document.body
+        && activeElement !== document.documentElement
+        && activeElement !== input;
+
+      if (anotherControlHasFocus) {
+        stopped = true;
+        return;
+      }
+
+      input.focus({ preventScroll: true });
+      if (document.hasFocus() && document.activeElement === input) {
+        input.setSelectionRange(input.value.length, input.value.length);
+        stopped = true;
+      }
+    };
+
+    const requestSearchFocus = () => {
+      if (stopped || document.visibilityState !== 'visible') return;
+      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+      animationFrame = window.requestAnimationFrame(() => {
+        animationFrame = null;
+        focusSearchInput();
+      });
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') requestSearchFocus();
+    };
+
+    requestSearchFocus();
+    [80, 200, 500, 1000, 1800, 3000].forEach(delay => {
+      timers.push(window.setTimeout(requestSearchFocus, delay));
+    });
+    window.addEventListener('focus', requestSearchFocus);
+    window.addEventListener('pageshow', requestSearchFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopped = true;
+      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+      timers.forEach(timer => window.clearTimeout(timer));
+      window.removeEventListener('focus', requestSearchFocus);
+      window.removeEventListener('pageshow', requestSearchFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   const containerBg = theme === 'transparent'
     ? `rgba(255, 255, 255, ${Math.max(0.04, opacity * 0.12)})`
@@ -365,6 +427,7 @@ export const SearchBox = memo(function SearchBox({ bookmarks, onFolderOpen, onSe
 
         <form onSubmit={handleSubmit} className="search-form">
           <input
+            ref={inputRef}
             type="text"
             className="search-input"
             placeholder={t(language, 'searchPlaceholder')}

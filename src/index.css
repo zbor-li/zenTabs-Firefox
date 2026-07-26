@@ -390,6 +390,35 @@ body {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
+.bookmark-icon-container.bookmark-icon-launching {
+  transform-origin: center center;
+  will-change: transform, filter;
+  animation: bookmarkIconLaunch 360ms cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+
+@keyframes bookmarkIconLaunch {
+  0% {
+    transform: translateY(0) scaleX(1) scaleY(1);
+    filter: brightness(1);
+  }
+  24% {
+    transform: translateY(5px) scaleX(1.16) scaleY(0.62);
+    filter: brightness(0.96);
+  }
+  55% {
+    transform: translateY(-5px) scaleX(0.9) scaleY(1.18);
+    filter: brightness(1.08);
+  }
+  76% {
+    transform: translateY(1px) scaleX(1.07) scaleY(0.94);
+    filter: brightness(1.03);
+  }
+  100% {
+    transform: translateY(0) scaleX(1) scaleY(1);
+    filter: brightness(1);
+  }
+}
+
 .bookmark-icon {
   width: 32px;
   height: 32px;
@@ -497,6 +526,8 @@ body {
 .home-surface.folder-open.folder-closing {
   opacity: 1;
   filter: none;
+  transition-duration: 210ms;
+  transition-timing-function: ease-out;
 }
 
 .home-surface.modal-open,
@@ -521,6 +552,8 @@ body {
 .home-toolbar.folder-open.folder-closing {
   opacity: 1;
   filter: none;
+  transition-duration: 210ms;
+  transition-timing-function: ease-out;
 }
 
 .folder-modal-overlay {
@@ -599,11 +632,11 @@ body {
 
 .folder-modal-overlay.closing {
   pointer-events: none;
-  animation: folderOverlayClose 110ms linear both;
+  animation: folderOverlayClose 210ms linear both;
 }
 
 .folder-modal-overlay.closing::before {
-  animation: folderBackdropOut 100ms ease-in both;
+  animation: folderBackdropOut 210ms ease-out both;
 }
 
 .folder-modal-overlay.closing .folder-modal-motion {

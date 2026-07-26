@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { BookmarkItem, GlobalSettings } from '../types';
 import { FaviconImage } from './FaviconImage';
 import { t } from '../i18n';
+import { launchWithIconAnimation } from '../iconLaunch';
 
 
 export interface FolderSourceRect {
@@ -125,7 +126,7 @@ export function FolderModal({ folder, isOpen, sourceRect, onClosing, onClose, on
     closeActionRef.current = afterClose;
     setIsClosing(true);
     onClosing();
-    closeTimerRef.current = window.setTimeout(finishClose, 220);
+    closeTimerRef.current = window.setTimeout(finishClose, 260);
   };
 
   const handleOverlayAnimationEnd = (event: React.AnimationEvent<HTMLDivElement>) => {
@@ -352,7 +353,11 @@ export function FolderModal({ folder, isOpen, sourceRect, onClosing, onClose, on
                   onDragEnd={() => { pointerDownRef.current = false; }}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDropItem(e, child)}
-                  onClick={() => child.url && onOpenLink(child.url)}
+                  onClick={(event) => {
+                    const destination = child.url;
+                    if (!destination) return;
+                    launchWithIconAnimation(event.currentTarget, () => onOpenLink(destination));
+                  }}
                   onContextMenu={(e) => { e.preventDefault(); onEditClick(child); }}
                 >
                   <div className="bookmark-icon-container" style={{ ...getItemStyle(child), backdropFilter: `blur(${getBlur(child)}px)`, WebkitBackdropFilter: `blur(${getBlur(child)}px)` }}>
