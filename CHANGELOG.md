@@ -4,6 +4,10 @@ All notable Firefox/Zen Browser release changes are documented here.
 
 ## [1.4.9] - 2026-07-26
 
+### Improved
+
+- After a folder finishes closing, its homepage folder icon continues with the existing squash-and-bounce animation without opening a website.
+
 ### Fixed
 
 - Search input focus now retries when the new-tab page becomes visible, is restored from the page cache, or receives window focus. This covers Zen/Firefox startup timing where the initial hidden-page focus attempts were previously skipped.

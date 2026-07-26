@@ -14,6 +14,7 @@ import DEFAULT_LOGO from './assets/logo.png';
 import { normalizeNavigationUrl } from './url';
 import { applyWallpaperBlurPreview } from './wallpaper';
 import { t } from './i18n';
+import { playIconLaunchAnimation } from './iconLaunch';
 
 interface AppProps {
   initialBookmarks?: BookmarkItem[];
@@ -52,6 +53,22 @@ function App({
     setFolderSourceRect(null);
     setIsFolderClosing(false);
   }, []);
+
+  const closeActiveFolder = useCallback(() => {
+    const closedFolderId = activeFolder?.id;
+    clearActiveFolder();
+    if (!closedFolderId) return;
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        const folderItem = Array.from(
+          document.querySelectorAll<HTMLElement>('.main-bookmark-grid .bookmark-item'),
+        ).find((item) => item.dataset.bookmarkId === closedFolderId);
+
+        if (folderItem) playIconLaunchAnimation(folderItem);
+      });
+    });
+  }, [activeFolder, clearActiveFolder]);
 
   const openFolderFromSearch = useCallback((folder: BookmarkItem) => {
     openFolder(folder, null);
@@ -305,7 +322,7 @@ function App({
           isOpen={!!activeFolder} 
           sourceRect={folderSourceRect}
           onClosing={() => setIsFolderClosing(true)}
-          onClose={clearActiveFolder}
+          onClose={closeActiveFolder}
           onUpdateFolder={handleUpdateFolder}
           onOpenLink={handleOpenLink}
           onExtractItem={handleExtractItem}

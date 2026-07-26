@@ -136,6 +136,7 @@ export function BookmarkGrid({ items, onItemsChange, onFolderClick, onEditClick,
         <div 
           key={item.id} 
           className="bookmark-item"
+          data-bookmark-id={item.id}
           draggable
           onDragStart={(e) => handleDragStart(e, item)}
           onDragOver={handleDragOver}

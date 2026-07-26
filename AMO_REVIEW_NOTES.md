@@ -23,7 +23,7 @@ Vite reports that `boot.js` and `boot.css` remain runtime assets during the buil
 
 1. Open a new tab to load Zen Tab.
 2. Add or edit a website shortcut, then open it.
-3. Drag shortcuts to reorder them or create a folder; open and close that folder.
+3. Drag shortcuts to reorder them or create a folder; close the folder to see the folder icon's short squash-and-bounce continuation animation.
 4. Search with a bundled engine, or enable/disable local suggestions in Settings.
 5. Optionally test **Alt+Shift+F** on a normal web page to add the current tab.
 6. Optional GitHub Gist backup requires a user-supplied token; no account or test credentials are needed for ordinary functionality.
