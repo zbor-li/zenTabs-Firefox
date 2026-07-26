@@ -50,6 +50,7 @@ export function Logo({ globalSettings, initialLogoUrl, initialLogoSize }: LogoPr
     <>
       <div 
         className="logo-container"
+        data-zen-page-entry-animation="logo"
         onDoubleClick={() => setIsModalOpen(true)}
         title={t(language, 'logoEditHint')}
         style={{

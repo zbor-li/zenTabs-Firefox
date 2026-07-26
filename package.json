@@ -2,7 +2,7 @@
   "name": "zen-startpage",
   "private": true,
   "license": "PolyForm-Noncommercial-1.0.0",
-  "version": "1.4.9",
+  "version": "1.4.11",
   "type": "module",
   "scripts": {
     "dev": "vite",

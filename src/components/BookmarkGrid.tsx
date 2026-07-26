@@ -161,7 +161,11 @@ export function BookmarkGrid({ items, onItemsChange, onFolderClick, onEditClick,
           }}
           onContextMenu={(e) => handleContextMenu(e, item)}
         >
-          <div className="bookmark-icon-container" style={{ ...getItemStyle(item), backdropFilter: `blur(${getBlur(item)}px)`, WebkitBackdropFilter: `blur(${getBlur(item)}px)` }}>
+          <div
+            className="bookmark-icon-container"
+            data-zen-page-entry-animation={item.type === 'folder' ? 'folder' : 'bookmark'}
+            style={{ ...getItemStyle(item), backdropFilter: `blur(${getBlur(item)}px)`, WebkitBackdropFilter: `blur(${getBlur(item)}px)` }}
+          >
             {item.type === 'folder' ? (
               <div className="folder-icon-container">
                 {item.children?.slice(0, 4).map((child) => (

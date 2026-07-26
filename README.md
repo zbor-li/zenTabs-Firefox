@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.4.9-6f42c1" alt="Version 1.4.9">
+  <img src="https://img.shields.io/badge/version-1.4.11-6f42c1" alt="Version 1.4.11">
   <img src="https://img.shields.io/badge/Firefox%20%2F%20Zen-142%2B-f97316" alt="Firefox and Zen Browser">
   <img src="https://img.shields.io/badge/license-PolyForm%20NC%201.0.0-8b1e3f" alt="PolyForm Noncommercial License 1.0.0">
 </p>

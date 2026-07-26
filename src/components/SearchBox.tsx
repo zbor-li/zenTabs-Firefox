@@ -12,6 +12,11 @@ import {
   type SearchSuggestion,
 } from '../searchSuggestions';
 import { normalizeNavigationUrl } from '../url';
+import {
+  cancelElementLaunchAnimation,
+  playElementLaunchAnimation,
+  ZEN_NAVIGATION_START_EVENT,
+} from '../iconLaunch';
 
 interface SearchBoxProps {
   bookmarks: BookmarkItem[];
@@ -116,7 +121,9 @@ export const SearchBox = memo(function SearchBox({ bookmarks, onFolderOpen, onSe
   const listboxId = useId();
   const engineMenuId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
+  const searchSurfaceRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigationPendingRef = useRef(false);
   const [query, setQuery] = useState('');
   const [history, setHistory] = useState<SearchHistoryEntry[]>([]);
   const [engines, setEngines] = useState<SearchEngine[]>(DEFAULT_ENGINES);
@@ -128,11 +135,17 @@ export const SearchBox = memo(function SearchBox({ bookmarks, onFolderOpen, onSe
 
   useEffect(() => {
     let stopped = false;
+    let pageActive = document.visibilityState === 'visible';
     let animationFrame: number | null = null;
     const timers: number[] = [];
 
     const focusSearchInput = () => {
-      if (stopped || document.visibilityState !== 'visible') return;
+      if (
+        stopped
+        || navigationPendingRef.current
+        || !pageActive
+        || document.visibilityState !== 'visible'
+      ) return;
 
       const input = inputRef.current;
       if (!input?.isConnected) return;
@@ -157,7 +170,12 @@ export const SearchBox = memo(function SearchBox({ bookmarks, onFolderOpen, onSe
     };
 
     const requestSearchFocus = () => {
-      if (stopped || document.visibilityState !== 'visible') return;
+      if (
+        stopped
+        || navigationPendingRef.current
+        || !pageActive
+        || document.visibilityState !== 'visible'
+      ) return;
       if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
       animationFrame = window.requestAnimationFrame(() => {
         animationFrame = null;
@@ -165,24 +183,61 @@ export const SearchBox = memo(function SearchBox({ bookmarks, onFolderOpen, onSe
       });
     };
 
+    const releaseSearchFocus = () => {
+      pageActive = false;
+      stopped = false;
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+      }
+      const input = inputRef.current;
+      if (input && document.activeElement === input) input.blur();
+    };
+
+    const restoreSearchFocus = () => {
+      if (navigationPendingRef.current || document.visibilityState !== 'visible') return;
+      pageActive = true;
+      stopped = false;
+      requestSearchFocus();
+    };
+
+    const handleNavigationStart = () => {
+      navigationPendingRef.current = true;
+      stopped = true;
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+      }
+      const searchSurface = searchSurfaceRef.current;
+      if (searchSurface) cancelElementLaunchAnimation(searchSurface);
+    };
+
+    const handlePageShow = () => {
+      navigationPendingRef.current = false;
+      restoreSearchFocus();
+    };
+
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') requestSearchFocus();
+      if (document.visibilityState === 'visible') restoreSearchFocus();
+      else releaseSearchFocus();
     };
 
     requestSearchFocus();
     [80, 200, 500, 1000, 1800, 3000].forEach(delay => {
       timers.push(window.setTimeout(requestSearchFocus, delay));
     });
-    window.addEventListener('focus', requestSearchFocus);
-    window.addEventListener('pageshow', requestSearchFocus);
+    window.addEventListener('pagehide', releaseSearchFocus);
+    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener(ZEN_NAVIGATION_START_EVENT, handleNavigationStart);
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       stopped = true;
       if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
       timers.forEach(timer => window.clearTimeout(timer));
-      window.removeEventListener('focus', requestSearchFocus);
-      window.removeEventListener('pageshow', requestSearchFocus);
+      window.removeEventListener('pagehide', releaseSearchFocus);
+      window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener(ZEN_NAVIGATION_START_EVENT, handleNavigationStart);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
@@ -382,8 +437,10 @@ export const SearchBox = memo(function SearchBox({ bookmarks, onFolderOpen, onSe
       style={{ width: `min(90vw, ${boxWidth}px)`, zIndex: isMenuOpen || displaySuggestions.length ? 999 : 10 }}
     >
       <div
+        ref={searchSurfaceRef}
         className="search-container"
         data-theme={theme}
+        data-zen-page-entry-animation="search"
         style={{
           width: '100%',
           height: `${boxHeight}px`,
@@ -439,6 +496,11 @@ export const SearchBox = memo(function SearchBox({ bookmarks, onFolderOpen, onSe
             onFocus={() => {
               setIsFocused(true);
               setSuggestionsDismissed(false);
+              window.requestAnimationFrame(() => {
+                if (!navigationPendingRef.current && searchSurfaceRef.current) {
+                  playElementLaunchAnimation(searchSurfaceRef.current);
+                }
+              });
             }}
             onBlur={event => {
               if (!containerRef.current?.contains(event.relatedTarget as Node | null)) setIsFocused(false);

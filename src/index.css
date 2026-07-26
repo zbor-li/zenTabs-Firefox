@@ -92,11 +92,7 @@ body {
   align-items: center;
   overflow: hidden;
   box-shadow: 0 10px 36px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  transition: box-shadow 220ms ease, border-color 220ms ease;
-}
-
-.search-container:focus-within {
-  box-shadow: 0 14px 46px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.12) !important;
+  transition: border-color 220ms ease;
 }
 
 .engine-selector {
@@ -390,7 +386,7 @@ body {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
-.bookmark-icon-container.bookmark-icon-launching {
+.zen-launch-animating {
   transform-origin: center center;
   will-change: transform, filter;
   animation: bookmarkIconLaunch 360ms cubic-bezier(0.22, 0.8, 0.24, 1) both;

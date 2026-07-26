@@ -14,7 +14,12 @@ import DEFAULT_LOGO from './assets/logo.png';
 import { normalizeNavigationUrl } from './url';
 import { applyWallpaperBlurPreview } from './wallpaper';
 import { t } from './i18n';
-import { playIconLaunchAnimation } from './iconLaunch';
+import {
+  cancelElementLaunchAnimation,
+  playIconLaunchAnimation,
+  playSynchronizedLaunchAnimations,
+  ZEN_NAVIGATION_START_EVENT,
+} from './iconLaunch';
 
 interface AppProps {
   initialBookmarks?: BookmarkItem[];
@@ -112,6 +117,74 @@ function App({
   useEffect(() => {
     document.documentElement.lang = settings.language === 'en' ? 'en' : 'zh-CN';
   }, [settings.language]);
+
+  useEffect(() => {
+    let firstFrame: number | null = null;
+    let secondFrame: number | null = null;
+    let lastAnimationAt = Number.NEGATIVE_INFINITY;
+    let navigationPending = false;
+
+    const cancelScheduledAnimation = () => {
+      if (firstFrame !== null) {
+        window.cancelAnimationFrame(firstFrame);
+        firstFrame = null;
+      }
+      if (secondFrame !== null) {
+        window.cancelAnimationFrame(secondFrame);
+        secondFrame = null;
+      }
+    };
+
+    const playPageEntryAnimation = () => {
+      if (navigationPending || document.visibilityState !== 'visible') return;
+
+      const now = window.performance.now();
+      if (now - lastAnimationAt < 160) return;
+      lastAnimationAt = now;
+
+      cancelScheduledAnimation();
+
+      firstFrame = window.requestAnimationFrame(() => {
+        firstFrame = null;
+        if (navigationPending || document.visibilityState !== 'visible') return;
+        secondFrame = window.requestAnimationFrame(() => {
+          secondFrame = null;
+          if (navigationPending || document.visibilityState !== 'visible') return;
+          playSynchronizedLaunchAnimations(
+            document.querySelectorAll<HTMLElement>('[data-zen-page-entry-animation]'),
+          );
+        });
+      });
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') playPageEntryAnimation();
+    };
+    const handlePageShow = () => {
+      navigationPending = false;
+      playPageEntryAnimation();
+    };
+    const handleNavigationStart = () => {
+      navigationPending = true;
+      cancelScheduledAnimation();
+      const searchSurface = document.querySelector<HTMLElement>(
+        '[data-zen-page-entry-animation="search"]',
+      );
+      if (searchSurface) cancelElementLaunchAnimation(searchSurface);
+    };
+
+    playPageEntryAnimation();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener(ZEN_NAVIGATION_START_EVENT, handleNavigationStart);
+
+    return () => {
+      cancelScheduledAnimation();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener(ZEN_NAVIGATION_START_EVENT, handleNavigationStart);
+    };
+  }, []);
 
   const handleBookmarksChange = (newBookmarks: BookmarkItem[]) => {
     setBookmarks(newBookmarks);

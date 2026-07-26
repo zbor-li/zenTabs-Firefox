@@ -2,11 +2,19 @@
 
 All notable Firefox/Zen Browser release changes are documented here.
 
-## [1.4.9] - 2026-07-26
+## [1.4.11] - 2026-07-27
+
+### Fixed
+
+- The search-box animation now replays when the user returns to the Zen Tab page while the search input retains focus.
+
+## [1.4.10] - 2026-07-27
 
 ### Improved
 
 - After a folder finishes closing, its homepage folder icon continues with the existing squash-and-bounce animation without opening a website.
+
+## [1.4.9] - 2026-07-26
 
 ### Fixed
 
